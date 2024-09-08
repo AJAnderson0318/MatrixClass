@@ -381,8 +381,8 @@ TEST_CASE( "Method add", "[Matrix]" )
 
   SECTION("invalid additions")
     {
-      std::vector<int> a = {1,2,3,4};
-      std::vector<int> b = {5,6};
+      std::vector<Elem> a = {1,2,3,4};
+      std::vector<Elem> b = {5,6};
 
       //2-by-2 + 2-by-1
       Matrix A(a, 2), B(b, 1);
@@ -501,7 +501,7 @@ TEST_CASE( "Method matrix mult", "[Matrix]" )
       Matrix B_33 = Matrix(b,3);
       Matrix C_33 = A_33.mult(B_33);
       
-      REQUIRE(equality(C_33, std::vector<int>{84,90,96,201,216,231,318,342,366}, 3, 3));
+      REQUIRE(equality(C_33, std::vector<Elem>{84,90,96,201,216,231,318,342,366}, 3, 3));
     }
 
   SECTION("invalid multiplications")
@@ -549,14 +549,14 @@ TEST_CASE( "Method scalar mult", "[Matrix]" )
   Matrix A_23 = Matrix(a, 3);
   Matrix B_23 = A_23.mult(2);
   
-  REQUIRE(equality(B_23, std::vector<int>{2, 4, 6, 8, 10, 12}, 2, 3));
+  REQUIRE(equality(B_23, std::vector<Elem>{2, 4, 6, 8, 10, 12}, 2, 3));
   
   //3-by-3
   a = {1,2,3,4,5,6,7,8,9};
   Matrix A_33 = Matrix(a, 3);
   Matrix B_33 = A_33.mult(2);
   
-  REQUIRE(equality(B_33, std::vector<int>{2, 4, 6, 8, 10, 12, 14, 16, 18}, 3, 3));
+  REQUIRE(equality(B_33, std::vector<Elem>{2, 4, 6, 8, 10, 12, 14, 16, 18}, 3, 3));
 }
 
 TEST_CASE( "Method pow", "[Matrix]" )
@@ -595,7 +595,7 @@ TEST_CASE( "Method pow", "[Matrix]" )
 
   SECTION("pow w/invalid inputs")
     {
-      std::vector<int> a = {1,2,3};
+      std::vector<Elem> a = {1,2,3};
 
       //1-by-3
       Matrix A(a, 3);
