@@ -13,10 +13,6 @@ Matrix::Matrix():  n(2)
     elements.resize(4);
     col_ind.resize(4);
     row_ind.resize(3);
-    for (int x=0; x< row_ind.size(); x++)
-    {
-        row_ind[x] = 0;
-    }
 
 }
 
@@ -41,10 +37,6 @@ Matrix::Matrix(std::size_t m, std::size_t n): n((n==0 || m==0)?0:n)
        col_ind.resize(n*m);
        elements.resize(n*m);
 
-        for (int x=0; x< row_ind.size(); x++)
-        {
-            row_ind[x] = 0;
-        }
    }
 //if m or n is zero then row resize should be 1
 }
@@ -68,10 +60,6 @@ Matrix::Matrix(const std::vector<Elem> &A, std::size_t n): n((n==0)?0:n)
              col_ind.resize(vecLength);
              elements.resize(vecLength);
 
-        for (int x=0; x< row_ind.size(); x++)
-        {
-            row_ind[x] = 0;
-        }
 
         for (int i = 0; i < vecLength; i++)
         {
@@ -114,11 +102,6 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n((n==0 || m==0
            elements.resize(m*n);
            col_ind.resize(m*n);
 
-            for (int x=0; x< row_ind.size(); x++)
-            {
-                row_ind[x] = 0;
-            }
-
 
             for (int i = 0; i < sizeof(ptr_A); i++)
             {
@@ -142,10 +125,8 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n((n==0 || m==0
     //Check that the index is valid
     if ( (i<0) || (j<0)|| (i >= row_ind.size()-1) || (j >= n))
     {
-        return test;
+        return -2147483648;
     }
-    // Find the row index of the value
-    
 
     //Iterate over col_ind from index start to end
     for (int x = row_ind[i]; x < row_ind[i+1]; x++)
@@ -167,15 +148,13 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n((n==0 || m==0
    */
   bool Matrix::e(std::size_t i, std::size_t j, Elem aij)
 {
-    Elem test = false;
 
     //Check that the index is valid
-    if ( (i<0) || (j<0)|| (i >= row_ind.size()-1) || (j > n))
+    if ( (i<0) || (j<0)|| (i >= row_ind.size()-1) || (j >= n))
     {
-        return test;
+        return false;
     }
-    if ( e(i,j) > 0)
-    {
+    
         for (int x = row_ind[i]; x < row_ind[i+1]; x++)
         {
             if (col_ind[x] == j)
@@ -185,25 +164,24 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n((n==0 || m==0
             }
         }
 
-    } 
-    else
-    {
-
-        for (int x = i; x < row_ind.size(); x++)
+        if (aij == 0)
         {
-            row_ind[i+1] = row_ind[i+1] + 1;
+            return true;
         }
-        col_ind.insert(col_ind.begin()+row_ind[i], j);
+
+
+        col_ind.insert(col_ind.begin()+row_ind[i+1], j);
         col_ind.pop_back();
-        elements.insert(elements.begin()+row_ind[i], aij);
+        elements.insert(elements.begin()+row_ind[i+1], aij);
         elements.pop_back();
         
+        for (int x = i+1; x < row_ind.size(); x++)
+        {
+            ++row_ind[x];
+        }
         return true;
         
-    }
-
     
-        return test;
 }
 
   /**
@@ -234,9 +212,19 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n((n==0 || m==0
 {
     bool ans = false;
     
-    if ( (elements == rhs.elements) && (row_ind == rhs.row_ind) && (col_ind == rhs.col_ind) && (n == rhs.n))
+    if ((size(1)==rhs.size(1)) && (size(2)==rhs.size(2)))
     {
-        ans = true;
+        for (int i = 0; i < rhs.size(1); i++)
+        {
+            for (int j = 0; j < rhs.size(2); j++)
+            {
+                if (e(i,j)!= rhs.e(i,j))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     return ans;

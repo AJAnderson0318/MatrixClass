@@ -143,8 +143,8 @@ TEST_CASE( "Element set", "[Matrix]" )
   Matrix A(3,3);
 
   //1. simple tests: create identity matrix (tests insert at each row and column)
-  REQUIRE(A.e(0,0,1));  //test case: insert into empty matrix
-  REQUIRE(A.e(0,0) == 1);
+  REQUIRE(A.e(0,0,2));  //test case: insert into empty matrix
+  REQUIRE(A.e(0,0) == 2);
 
   REQUIRE(A.e(1,1,1));  //test case: insert into non-empty matrix but empty row
   REQUIRE(A.e(1,1) == 1);
