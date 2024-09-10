@@ -4,7 +4,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <iostream>
-#include <string>
 #include <vector>
 
 /**
@@ -117,7 +116,7 @@ public:
   /**
    * Creates and returns a new Matrix object that is the multiplication of this and the given scalar.
    * @return a new Matrix object that contains the multiplication of this and the given scalar.
-   * @param k - the scalar value to multiply with this object.
+   * @param rhs - the scalar value to multiply with this object.
    */
   Matrix mult( Scalar k ) const;
 
@@ -137,7 +136,6 @@ public:
   /**
    * Creates and returns a new Matrix object that is the concatenation of this and the given Matrix object.
    * @return a new Matrix object that is the vertical or horizontal concatenation of two matrices, a 0-by-0 matrix if matrices can't be concatenated.
-   * @param rhs - the Matrix object to concatenate to this object.
    * @param dim - 1 for vertical cat (RHS below this), 2 for horizontal cat (RHS to the right of this)
    */
   Matrix cat(const Matrix &rhs, std::size_t dim) const;
@@ -172,7 +170,6 @@ public:
    * Ri = Ri + k*Rj
    * @return true if row i Ri
    * @param i - row number
-   * @param j - column number
    * @param k - scalar to multiply row i by
    */
   bool rowAdd(std::size_t i, std::size_t j, Scalar k);
@@ -187,14 +184,11 @@ public:
 
 private:
   std::vector<Elem> elements; //The elements of our matrix; size is equal to the number of non-zero elements
-  const std::size_t n; //number of columns in the matrix (const as matrices shouldn't change size after being defined)
+  const std::size_t n; //number of columns in the matrix
   std::vector<std::size_t> col_ind; //column for the i-th element of elements (i.e., col_ind[i] is the column for elements[i])
   std::vector<std::size_t> row_ind; //number of non-zero elements above row i (i.e., row_ind[i] = sum(non-zero elements in
                                     //rows zero to i-1)), remember this should have an extra entry at the end of the vector where
                                     //we store the total number of non-zero entries in elements
-  //Feel free to add your own private methods below.  The below may be helpful but you're aren't required to implement them; remove if unused.
-  void show(const std::string &msg) const; //display contents of elements, col_ind, and row_ind with optional message
-  //insert element aij in column *before* c_ind and update row_ind for row i; j represents user-supplied target column for aij 
-  void insert(const Elem &aij, std::size_t i, std::size_t j, std::size_t c_ind);
+  //Feel free to add your own private methods below
 };
 #endif

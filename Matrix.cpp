@@ -4,14 +4,20 @@
 #include "Matrix.hpp"
 //your code here...
 
-
   /**
    * Default constructor. It should create an empty 2-by-2 matrix.
    */ 
 Matrix::Matrix():  n(2) 
 {
     //row_ind need to be size of row plus 1
-    row_ind = {0, 0, 0};
+    elements.resize(4);
+    col_ind.resize(4);
+    row_ind.resize(3);
+    for (int x=0; x< row_ind.size(); x++)
+    {
+        row_ind[x] = 0;
+    }
+
 }
 
   /**
@@ -19,12 +25,28 @@ Matrix::Matrix():  n(2)
    * @param m - number of row for the new matrix.
    * @param n - number of columns for the new matrix.
    */ 
-Matrix::Matrix(std::size_t m, std::size_t n): n(n)
+Matrix::Matrix(std::size_t m, std::size_t n): n((n==0 || m==0)?0:n) 
 {
-    for (int i = 0; i <= m; i++)
-    {
-        row_ind.push_back(0);
-    }
+    //add check for parameters = 0
+   //inialize  
+   if ( (m == 0) || (n == 0))
+   {
+       row_ind.resize(1);
+       elements.resize(0);
+       col_ind.resize(0);
+   }
+   else
+   {
+       row_ind.resize(m+1);
+       col_ind.resize(n*m);
+       elements.resize(n*m);
+
+        for (int x=0; x< row_ind.size(); x++)
+        {
+            row_ind[x] = 0;
+        }
+   }
+//if m or n is zero then row resize should be 1
 }
   
   /**
@@ -32,29 +54,41 @@ Matrix::Matrix(std::size_t m, std::size_t n): n(n)
    * @param A - values for matrix elements, specified using a dense, row-major order vector
    * @param n - number of columns for the new matrix.
    */ 
-Matrix::Matrix(const std::vector<Elem> &A, std::size_t n): n(n)
+Matrix::Matrix(const std::vector<Elem> &A, std::size_t n): n((n==0)?0:n)
 {
-    if ( (A.size()%n) == 0) //Checks that this combination of matrix size and columns can work
-    { 
+    int vecLength = A.size();
+    
+//if or n is zero then row resize should be 1
+    if ((n != 0) )
+    {
+        int rowSize = A.size() / n + 1 ;    // number of rows plus one
         
-        int row_count = A.size() / n;
-        
-        for (int i = 0; i <= row_count+1; i++)
+         //initialize the private vectors
+             row_ind.resize(rowSize);
+             col_ind.resize(vecLength);
+             elements.resize(vecLength);
+
+        for (int x=0; x< row_ind.size(); x++)
         {
-            row_ind.push_back(0);
-        }
-        for (int i = 0; i < A.size(); i++)
-        {
-            if (A[i] != 0)
-            {
-                elements.push_back(A[i]);
-                col_ind.push_back(i%n);
-                row_ind[(i/n)+1] = row_ind[(i/n)+1] +1;
-            }
+            row_ind[x] = 0;
         }
 
+        for (int i = 0; i < vecLength; i++)
+        {
+                e(i/n, i%n, A[i]);
+        }
+    }
+    else
+    {
+
+     //initialize the private vectors
+         row_ind.resize(1);
+         col_ind.resize(0);
+         elements.resize(0);
 
     }
+    //iterate from zero to size of A
+
 }
 
   /**
@@ -63,29 +97,35 @@ Matrix::Matrix(const std::vector<Elem> &A, std::size_t n): n(n)
    * @param m - number of rows for the new matrix.
    * @param n - number of columns for the new matrix.
    */ 
-Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n(n)
+Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n((n==0 || m==0)?0:n)
 {
+    //m*n 
 
-        for (int i = 0; i < m+1; i++)
-        {
-            row_ind.push_back(0);
-        }
-            
-        int colIndex = 0;
-        for (int i = 0; i < m*n; i++)
-        {
-            if (colIndex == n)
+        
+       if ( (m == 0) || (n == 0))
+       {
+           row_ind.resize(1);
+           elements.resize(0);
+           col_ind.resize(0);
+       }
+       else
+       {
+           row_ind.resize(m+1);
+           elements.resize(m*n);
+           col_ind.resize(m*n);
+
+            for (int x=0; x< row_ind.size(); x++)
             {
-                colIndex = 0;
+                row_ind[x] = 0;
             }
-            if (ptr_A[i] != 0)
+
+
+            for (int i = 0; i < sizeof(ptr_A); i++)
             {
-             elements.push_back(ptr_A[i]);
-             row_ind[i+1] = row_ind[i+1] + 1;
-             col_ind.push_back(colIndex);
+                    e(i/n, i%n,ptr_A[i]);
             }
-            colIndex++;
-        }
+
+       }
 }
 
   
@@ -97,17 +137,25 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n(n)
    */ 
   Elem Matrix::e(std::size_t i, std::size_t j) const
 {
-    if ( (i > -1) && (j > -1)&& (i < row_ind.size()) && (j < n)) // check for valid indexes
+    Elem test = 0;
+
+    //Check that the index is valid
+    if ( (i<0) || (j<0)|| (i >= row_ind.size()-1) || (j >= n))
     {
-        for (int x = row_ind[i]; x < row_ind[i+1]; x++)
+        return test;
+    }
+    // Find the row index of the value
+    
+
+    //Iterate over col_ind from index start to end
+    for (int x = row_ind[i]; x < row_ind[i+1]; x++)
+    {
+        if (col_ind[x] == j)
         {
-            if (col_ind[x] == j)
-            {
-                return elements[x];
-            }
+            return elements[x];
         }
     }
-        return 0;
+        return test;
 }
   
   /**
@@ -119,11 +167,16 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n(n)
    */
   bool Matrix::e(std::size_t i, std::size_t j, Elem aij)
 {
+    Elem test = false;
+
     //Check that the index is valid
-    if ((i < row_ind.size()) && (i > -1) && ( j > n) && ( j > -1))
+    if ( (i<0) || (j<0)|| (i >= row_ind.size()-1) || (j > n))
     {
-        //if element exists then replace existing value in elements
-        for (int x = row_ind[i]; x < row_ind[i+1]; i++)
+        return test;
+    }
+    if ( e(i,j) > 0)
+    {
+        for (int x = row_ind[i]; x < row_ind[i+1]; x++)
         {
             if (col_ind[x] == j)
             {
@@ -131,13 +184,26 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n(n)
                 return true;
             }
         }
-        col_ind.insert(col_ind.begin()+row_ind[i+1], j);
-        elements.insert(elements.begin()+row_ind[i+1], aij);
-        row_ind[i+1] = row_ind[i+1] + 1;
-        return true;
 
+    } 
+    else
+    {
+
+        for (int x = i; x < row_ind.size(); x++)
+        {
+            row_ind[i+1] = row_ind[i+1] + 1;
+        }
+        col_ind.insert(col_ind.begin()+row_ind[i], j);
+        col_ind.pop_back();
+        elements.insert(elements.begin()+row_ind[i], aij);
+        elements.pop_back();
+        
+        return true;
+        
     }
-    return false;
+
+    
+        return test;
 }
 
   /**
@@ -183,21 +249,7 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n(n)
    */
   Matrix Matrix::add( const Matrix &rhs ) const
 {
-    
-    Matrix result = Matrix(0,0);
-  if ( (row_ind.size() == rhs.row_ind.size()) && (n == rhs.n))
-  {
-    std::vector<Elem> newValues;
-
-    for (int i = 0; i < row_ind.size(); i++)
-    {
-        for ( int j = 0; i < n; i++)
-        {
-            newValues.push_back( e(i,j) + rhs.e(i,j) );
-        }
-    }
-    result = Matrix(newValues, n); 
-  }
+    Matrix result;
   return result;
 }
 
@@ -209,20 +261,7 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n(n)
   Matrix Matrix::sub( const Matrix &rhs ) const
 {
     
-    Matrix result = Matrix(0,0);
-  if ( (row_ind.size() == rhs.row_ind.size()) && (n == rhs.n))
-  {
-    std::vector<Elem> newValues;
-
-    for (int i = 0; i < row_ind.size(); i++)
-    {
-        for ( int j = 0; i < n; i++)
-        {
-            newValues.push_back( e(i,j) - rhs.e(i,j) );
-        }
-    }
-    result = Matrix(newValues, n); 
-  }
+    Matrix result;
   return result;
 }
 
@@ -234,13 +273,6 @@ Matrix::Matrix(const Elem *ptr_A, std::size_t m, std::size_t n): n(n)
   Matrix Matrix::mult( const Matrix &rhs ) const
 {
     Matrix ans = Matrix(0,0);
-
-    if ( n == rhs.row_ind.size()-1) //if the matrices can be multiplied
-    {
-        Matrix mult = Matrix(row_ind.size() -1, rhs.n);
-
-
-    }
 
 
     return ans;
@@ -359,31 +391,14 @@ Matrix& Matrix::operator=(Matrix A)
   
 std::ostream& operator<<(std::ostream& os, const Matrix &A)
 {
-  std::vector<Elem> A_d; //dense representation of the Matrix A
-  std::size_t r_ind; //index in col_ind/elements where row i begins
-  std::size_t r_cnt; //number of entries in col_ind/elements for the i-th row
-  std::size_t i, j; //for looping
   
-  A_d.resize((A.row_ind.size() - 1) * A.n); //matrix of zeros with size m * n 
-
-  //add entries from sparse matrix to dense matrix
-  for(i = 0; i < A.row_ind.size() - 1; i++) //iterate over rows
+  for(std::size_t i = 0; i < A.elements.size(); i++)
     {
-      r_ind = A.row_ind[i]; //index in elements/col_ind for first entry in row i
-      r_cnt = A.row_ind[i+1] - A.row_ind[i]; //number of elements in row i
-
-      for(j = r_ind; j < r_ind + r_cnt; j++) //iterate over elements in row
-	A_d[ (i * A.n) + A.col_ind[j] ] = A.elements[j]; //convert (i,j) to row-major order index
-    }
- 
-  //output matrix
-  for(i = 0; i < A_d.size(); i++)
-    {
-      //beginning of a row (column zero), insert a line break, unless we're in the first row
+      //beginning of a row (column zero): insert a line break unless we're in the first row
       if(i != 0 && i % A.n == 0)
 	os << std::endl;
       
-      os << A_d[i] << " ";
+      os << A.elements[i] << " ";
     }
 
   return os;

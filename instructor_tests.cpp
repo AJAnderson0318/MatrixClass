@@ -92,13 +92,13 @@ TEST_CASE( "Parameterized constructor 1", "[Matrix]" )
 
   //test case: invalid dimensions, row
   Matrix C(0,1);
-  REQUIRE(C.size(1) == 0);
+  REQUIRE(C.size(3) == 0);
   REQUIRE(C.size(2) == 0);
   
   //test case: invalid dimensions, column
   Matrix D(1,0);
   REQUIRE(D.size(1) == 0);
-  REQUIRE(D.size(2) == 0);
+  REQUIRE(D.size(3) == 0);
 }
 
 /**
